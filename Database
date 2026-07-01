@@ -1,1 +1,22 @@
+Schema.SQL
+CREATE TABLE FormSubmissions (
+    SubmissionID INT IDENTITY PRIMARY KEY,
+    FirstName VARCHAR(100),
+    LastName VARCHAR(100),
+    Email VARCHAR(150),
+    ServiceType VARCHAR(100),
+    CreatedDate DATETIME DEFAULT GETDATE()
+);
 
+
+--Stored_Procedures.SQL
+CREATE PROCEDURE InsertFormSubmission
+    @FirstName VARCHAR(100),
+    @LastName VARCHAR(100),
+    @Email VARCHAR(150),
+    @ServiceType VARCHAR(100)
+AS
+BEGIN
+    INSERT INTO FormSubmissions (FirstName, LastName, Email, ServiceType)
+    VALUES (@FirstName, @LastName, @Email, @ServiceType)
+END
