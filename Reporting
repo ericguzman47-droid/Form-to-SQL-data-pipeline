@@ -1,1 +1,6 @@
-
+-- SampleQueires.sql
+SELECT 
+    ServiceType,
+    COUNT(*) AS TotalSubmissions
+FROM FormSubmissions
+GROUP BY ServiceType;
