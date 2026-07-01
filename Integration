@@ -1,1 +1,7 @@
-
+-- ninja_forms_webhook_example.JSON
+{
+  "firstName": "Eric",
+  "lastName": "Guzman",
+  "email": "eric@email.com",
+  "serviceType": "Burial Service"
+}
