@@ -1,1 +1,77 @@
+--FormSubmission.cs
+public class FormSubmission
+{
+    public string FirstName { get; set; }
+    public string LastName { get; set; }
+    public string Email { get; set; }
+    public string ServiceType { get; set; }
+}
 
+---SqlService.cs
+using System.Data;
+using System.Data.SqlClient;
+
+public class SqlService
+{
+    private readonly string _connectionString;
+
+    public SqlService(IConfiguration config)
+    {
+        _connectionString = config.GetConnectionString("DefaultConnection");
+    }
+
+    public async Task InsertFormSubmission(FormSubmission data)
+    {
+        using var conn = new SqlConnection(_connectionString);
+        using var cmd = new SqlCommand("InsertFormSubmission", conn);
+
+        cmd.CommandType = CommandType.StoredProcedure;
+
+        cmd.Parameters.AddWithValue("@FirstName", data.FirstName);
+        cmd.Parameters.AddWithValue("@LastName", data.LastName);
+        cmd.Parameters.AddWithValue("@Email", data.Email);
+        cmd.Parameters.AddWithValue("@ServiceType", data.ServiceType);
+
+        await conn.OpenAsync();
+        await cmd.ExecuteNonQueryAsync();
+    }
+}
+
+--FormSubmissionController.cs
+using Microsoft.AspNetCore.Mvc;
+
+[ApiController]
+[Route("api/[controller]")]
+public class FormSubmissionController : ControllerBase
+{
+    private readonly SqlService _sqlService;
+
+    public FormSubmissionController(SqlService sqlService)
+    {
+        _sqlService = sqlService;
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> ReceiveForm([FromBody] FormSubmission data)
+    {
+        await _sqlService.InsertFormSubmission(data);
+        return Ok(new { message = "Submission saved successfully" });
+    }
+}
+--Program.cs
+var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddControllers();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
+builder.Services.AddScoped<SqlService>();
+
+var app = builder.Build();
+
+app.UseSwagger();
+app.UseSwaggerUI();
+
+app.MapControllers();
+
+app.Run();
